@@ -31,10 +31,10 @@ else
 echo -e "version anda tidak terdeteksi!"
 exit
 fi
-wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl-tunnel/main/stabil3/stl.sh" -O /usr/bin/stl
-wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl-tunnel/main/stabil3/gproxy.sh" -O /usr/bin/gproxy
-wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl-tunnel/main/stabil3/autorekonek-stl.sh" -O /usr/bin/autorekonek-stl
-opkg install openvpn-openssl && opkg install ip-full && opkg install openssh-client && opkg install stunnel && opkg install *.ipk && opkg install lsof && opkg install fping screen ncat
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/stl.sh" -O /usr/bin/stl
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/gproxy.sh" -O /usr/bin/gproxy
+wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/autorekonek-stl.sh" -O /usr/bin/autorekonek-stl
+opkg install openvpn-openssl && opkg install ip-full && opkg install openssh-client && opkg install stunnel && opkg install *.ipk && opkg install lsof && opkg install fping screen
 chmod +x /usr/bin/gproxy
 chmod +x /usr/bin/stl
 chmod +x /usr/bin/autorekonek-stl
