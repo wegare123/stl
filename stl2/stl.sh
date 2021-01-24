@@ -201,17 +201,6 @@ clientAddr]))
 
 server.close()" > /usr/bin/http-stl
 chmod +x /usr/bin/http-stl
-echo "Host http*
-    PermitLocalCommand yes
-    LocalCommand gproxy %h
-    TCPKeepAlive yes
-    ServerAliveInterval 30
-    ServerAliveCountMax 1200
-    GatewayPorts yes
-Host http1
-    HostName $host
-    Port $port
-    User $user" > /root/.ssh/config
 elif [ "$met" = "https" ]; then
 echo "Masukkan bug" 
 read -p "default bug: $bug2 : " bug
@@ -266,7 +255,9 @@ port="$(cat /root/akun/stl.txt | grep -i port | cut -d= -f2 | head -n1)"
 pass="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)" 
 http-stl > /dev/null &
 sleep 2
-sshpass -p $pass ssh -N http1 -CND :1080 -o "Proxycommand=ncat --proxy-type http --proxy 127.0.0.1:6969 %h %p" &
+screen -d -m sshpass -p $pass ssh -oStrictHostKeyChecking=no -CND :1080 -p "$port" "$user"@"$host" -o "Proxycommand=ncat --proxy-type http --proxy 127.0.0.1:6969 %h %p"
+sleep 2
+gproxy &
 elif [ "$met" = "https" ]; then
 cek="$(ls /root/.ssh/ | grep -i know | cut -d_ -f1)" 
 if [ "$cek" = "known" ]; then
@@ -295,7 +286,7 @@ elif [ "${tools}" = "3" ]; then
 host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
 #killall screen
-killall -q tun2socks ssh ping-stl stunnel sshpass http-stl
+killall -q tun2socks ssh ping-stl stunnel sshpass http-stl screen
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
 killall dnsmasq 
