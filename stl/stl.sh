@@ -281,7 +281,7 @@ chmod +x /usr/bin/ping-stl
 elif [ "${tools}" = "3" ]; then
 host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
-killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass http-stl screen
+killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass http-stl screen fping
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
