@@ -271,11 +271,11 @@ else
 echo "anda belum membuat profile"
 exit
 fi
-cat <<EOF> /usr/bin/ping-stl
+echo '
 #!/bin/bash
 #stl (Wegare)
-fping -l 10.0.0.2
-EOF
+host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
+fping -l $host' > /usr/bin/ping-stl
 chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 elif [ "${tools}" = "3" ]; then
