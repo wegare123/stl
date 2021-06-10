@@ -11,7 +11,7 @@ pp2="$(cat /root/akun/stl.txt | grep -i pp | cut -d= -f2 | tail -n1)"
 payload2="$(cat /root/akun/stl.txt | grep -i payload | cut -d= -f2)" 
 proxy2="$(cat /root/akun/stl.txt | grep -i proxy | cut -d= -f2)" 
 met2="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2 | head -n1)" 
-echo "Inject http & https by wegare"
+echo "Inject http/https/direct by wegare"
 echo "1. Sett Profile"
 echo "2. Start Inject"
 echo "3. Stop Inject"
@@ -21,7 +21,7 @@ echo "e. exit"
 read -p "(default tools: 2) : " tools
 [ -z "${tools}" ] && tools="2"
 if [ "$tools" = "1" ]; then
-echo "Pilih inject http/https" 
+echo "Pilih inject http/https/direct" 
 read -p "default inject: $met2 : " met
 [ -z "${met}" ] && met="$met2"
 
@@ -223,8 +223,38 @@ Host ssl1
     HostName 127.0.0.1
     Port 69
     User $user" > /root/.ssh/config
+elif [ "$met" = "direct" ]; then
+echo "Masukkan payload" 
+read -p "default payload: $payload2 : " payload
+[ -z "${payload}" ] && payload="$payload2"
+cat <<EOF> /root/.brainfuck-tunnel/config/payload.txt
+$payload
+
+EOF
+cat <<EOF> /root/.brainfuck-tunnel/database/account.json
+{
+  "host": "$host",
+  "port": "$port",
+  "username": "$user",
+  "password": "$pass",
+  "sockport": "1080"
+}
+
+EOF
+cat <<EOF> /root/.brainfuck-tunnel/config/config.json
+{
+  "inject_host": "127.0.0.1",
+  "inject_port": "6969",
+  "tunnel_type": "0",
+
+  "proxy_command": "ncat --proxy-type http --proxy {inject_host}:{inject_port} %host %port",
+  "proxy_command": "nc -X CONNECT -x {inject_host}:{inject_port} %h %p",
+  "proxy_command": "corkscrew {inject_host} {inject_port} %h %p"
+}
+
+EOF
 else 
-echo -e "$met: invalid selection."
+echo "Anda belum memilih inject http/https/direct"
 exit
 fi
 echo "met=$met
@@ -267,6 +297,11 @@ pass="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)"
 stunnel /root/akun/ssl.conf > /dev/null &
 sleep 1
 sshpass -p $pass ssh -N ssl1 &
+elif [ "$met" = "direct" ]; then
+chmod +x /root/brainfuck
+/root/./brainfuck start > /dev/null &
+sleep 2
+gproxy &
 else
 echo "anda belum membuat profile"
 exit
@@ -286,7 +321,9 @@ route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
-killall dnsmasq 
+killall dnsmasq
+chmod +x /root/brainfuck
+/root/./brainfuck stop > /dev/null &
 /etc/init.d/dnsmasq start > /dev/null
 sleep 2
 echo "Stop Suksess"
