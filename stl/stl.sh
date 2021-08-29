@@ -11,7 +11,7 @@ pp2="$(cat /root/akun/stl.txt | grep -i pp | cut -d= -f2 | tail -n1)"
 payload2="$(cat /root/akun/stl.txt | grep -i payload | cut -d= -f2)" 
 proxy2="$(cat /root/akun/stl.txt | grep -i proxy | cut -d= -f2)" 
 met2="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2 | head -n1)" 
-echo "Inject http/https/direct by wegare"
+echo "Inject http/https/direct/sp by wegare"
 echo "1. Sett Profile"
 echo "2. Start Inject"
 echo "3. Stop Inject"
@@ -21,7 +21,13 @@ echo "e. exit"
 read -p "(default tools: 2) : " tools
 [ -z "${tools}" ] && tools="2"
 if [ "$tools" = "1" ]; then
-echo "Pilih inject http/https/direct" 
+echo "Pilih inject http/https/direct/sp" 
+echo "Keterangan: " 
+echo "http     = http proxy + payload" 
+echo "https    = ssl/tls direct" 
+echo "direct   = ssh direct + payload" 
+echo "sp       = ssl/tls + payload" 
+echo "" 
 read -p "default inject: $met2 : " met
 [ -z "${met}" ] && met="$met2"
 
@@ -253,6 +259,35 @@ cat <<EOF> /root/.brainfuck-tunnel/config/config.json
 }
 
 EOF
+elif [ "$met" = "sp" ]; then
+echo "Masukkan SNI" 
+read -p "default SNI: $bug2 : " bug
+[ -z "${bug}" ] && bug="$bug2"
+echo "Masukkan payload" 
+read -p "default payload: $payload2 : " payload
+[ -z "${payload}" ] && payload="$payload2"
+cat <<EOF> /root/akun/settings.ini
+[mode]
+
+connection_mode = 3
+
+[config]
+payload = $payload
+proxyip = 
+proxyport = 
+
+auto_replace = 1
+
+[ssh]
+host = $host
+port = $port
+username = $user
+password = $pass
+
+[sni]
+server_name = $bug   
+
+EOF
 else 
 echo "Anda belum memilih inject http/https/direct"
 exit
@@ -284,9 +319,9 @@ host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
 port="$(cat /root/akun/stl.txt | grep -i port | cut -d= -f2 | head -n1)" 
 pass="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)" 
 http-stl > /dev/null &
-sleep 2
+sleep 1
 screen -d -m sshpass -p $pass ssh -oStrictHostKeyChecking=no -CND :1080 -p "$port" "$user"@"$host" -o "Proxycommand=ncat --proxy-type http --proxy 127.0.0.1:6969 %h %p"
-sleep 2
+sleep 5
 gproxy &
 elif [ "$met" = "https" ]; then
 cek="$(ls /root/.ssh/ | grep -i know | cut -d_ -f1)" 
@@ -300,8 +335,15 @@ sshpass -p $pass ssh -N ssl1 &
 elif [ "$met" = "direct" ]; then
 chmod +x /root/brainfuck
 /root/./brainfuck start > /dev/null &
-sleep 2
+sleep 5
 gproxy &
+elif [ "$met" = "sp" ]; then
+python3 /root/akun/tunnel.py &
+sleep 1
+python3 /root/akun/ssh.py 1 &
+sleep 5
+gproxy &
+rm -r /root/logs.txt
 else
 echo "anda belum membuat profile"
 exit
@@ -315,16 +357,17 @@ chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 elif [ "${tools}" = "3" ]; then
 host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
-route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
-killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass http-stl screen fping
+route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
+killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass http-stl screen fping python3
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
-killall dnsmasq
+/etc/init.d/dnsmasq restart > /dev/null
+#killall dnsmasq
 chmod +x /root/brainfuck
 /root/./brainfuck stop > /dev/null &
-/etc/init.d/dnsmasq start > /dev/null
+#/etc/init.d/dnsmasq start > /dev/null
 sleep 2
 echo "Stop Suksess"
 sleep 2
