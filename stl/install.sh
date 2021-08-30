@@ -31,6 +31,7 @@ else
 echo -e "version anda tidak terdeteksi!"
 exit
 fi
+mkdir -p ~/akun/
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/stl.sh" -O /usr/bin/stl
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/gproxy.sh" -O /usr/bin/gproxy
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/autorekonek-stl.sh" -O /usr/bin/autorekonek-stl
@@ -48,7 +49,6 @@ chmod +x /root/akun/inject.py
 chmod +x /usr/bin/autorekonek-stl
 rm -r ~/*.ipk
 rm -r ~/install.sh
-mkdir -p ~/akun/
 mkdir -p ~/.ssh/
 touch ~/akun/ssl.conf
 touch ~/.ssh/config
