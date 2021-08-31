@@ -363,7 +363,7 @@ route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
-/etc/init.d/dnsmasq restart > /dev/null
+/etc/init.d/dnsmasq restart 2>/dev/null
 #killall dnsmasq
 chmod +x /root/brainfuck
 /root/./brainfuck stop > /dev/null &
