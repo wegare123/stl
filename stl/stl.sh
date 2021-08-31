@@ -339,7 +339,7 @@ sleep 5
 gproxy &
 elif [ "$met" = "sp" ]; then
 python3 /root/akun/tunnel.py &
-sleep 1
+sleep 2
 python3 /root/akun/ssh.py 1 &
 sleep 5
 gproxy &
