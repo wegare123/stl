@@ -1,6 +1,5 @@
 #!/bin/bash
 #stl (Wegare)
-clear
 udp2="$(cat /root/akun/stl.txt | grep -i udp | cut -d= -f2)" 
 user2="$(cat /root/akun/stl.txt | grep -i user | cut -d= -f2 | head -n1)" 
 host2="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
@@ -11,6 +10,84 @@ pp2="$(cat /root/akun/stl.txt | grep -i pp | cut -d= -f2 | tail -n1)"
 payload2="$(cat /root/akun/stl.txt | grep -i payload | cut -d= -f2)" 
 proxy2="$(cat /root/akun/stl.txt | grep -i proxy | cut -d= -f2)" 
 met2="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2 | head -n1)" 
+clear
+
+start () {
+cek="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
+if [[ -z $cek ]]; then
+echo "anda belum membuat profile"
+exit
+fi
+stop
+ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
+echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
+ip tuntap add dev tun1 mode tun
+ifconfig tun1 10.0.0.1 netmask 255.255.255.0
+clear
+nohup python3 /root/akun/tunnel.py > /dev/null 2>&1 &
+sleep 1
+nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
+echo "is connecting to the internet"
+for i in {1..3}
+do
+sleep 5
+var=`cat /root/logs.txt | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'`
+	if [ "$var" = "SUCCESSFULLY" ];then 
+		gproxy &
+		break
+	else
+		echo "Reconnect 5s"
+	fi
+	echo -e "Failed!"
+	stop
+done
+rm -r /root/logs.txt
+
+echo '
+#!/bin/bash
+#stl (Wegare)
+host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
+fping -l $host' > /usr/bin/ping-stl
+chmod +x /usr/bin/ping-stl
+/usr/bin/ping-stl > /dev/null 2>&1 &
+}
+
+stop () {
+host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
+route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
+killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass screen fping python3
+route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
+route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
+route del "$host" gw "$route" metric 0 2>/dev/null
+ip link delete tun1 2>/dev/null
+/etc/init.d/dnsmasq restart 2>/dev/null
+}
+
+config () {
+cat <<EOF> /root/akun/settings.ini
+[mode]
+
+connection_mode = $modeconfig
+
+[config]
+payload = $payload
+proxyip = $proxy
+proxyport = $pp
+
+auto_replace = 1
+
+[ssh]
+host = $host
+port = $port
+username = $user
+password = $pass
+
+[sni]
+server_name = $bug   
+
+EOF
+}
+
 echo "Inject http/https/direct/sp by wegare"
 echo "1. Sett Profile"
 echo "2. Start Inject"
@@ -60,205 +137,26 @@ echo "Masukkan proxy"
 read -p "default proxy: $proxy2 : " proxy
 [ -z "${proxy}" ] && proxy="$proxy2"
 
-echo "Masukkan port" 
+echo "Masukkan port proxy" 
 read -p "default port: $pp2 : " pp
 [ -z "${pp}" ] && pp="$pp2"
+modeconfig='1'
+config
 
-echo "#!/usr/bin/python
-######################################
-#########__Injector Python__##########
-######################################
-BIND_ADDR = '0.0.0.0'
-BIND_PORT = 6969
-PROXT_ADDR = '$proxy'
-PROXY_PORT = $pp
-PAYLOAD = '$payload'
-import socket
-import thread
-import string
-import select
-
-TAM_BUFFER = 65535
-MAX_CLIENT_REQUEST_LENGTH = 8192 * 8
-
-def getReplacedPayload(payload, netData, hostPort, protocol):
-    str = payload.replace('[netData]', netData)
-    str = str.replace('[host_port]', (hostPort[0] + ':' + hostPort[1]))
-    str = str.replace('[host]', hostPort[0])
-    str = str.replace('[port]', hostPort[1])
-    str = str.replace('[protocol]', protocol)
-    str = str.replace('[crlf]', '\r\n')
-    return str
-
-def getRequestProtocol(request):
-    inicio = request.find(' ', request.find(':')) + 1
-    str = request[inicio:]
-    fim = str.find('\r\n')
-
-    return str[:fim]
-
-def getRequestHostPort(request):
-    inicio = request.find(' ') + 1
-    str = request[inicio:]
-    fim = str.find(' ')
-
-    hostPort = str[:fim]
-
-    return hostPort.split(':')
-
-def getRequestNetData(request):
-    return request[:request.find('\r\n')]
-
-def receiveHttpMsg(socket):
-    len = 1
-
-    data = socket.recv(1)
-    while data.find('\r\n\r\n'.encode()) == -1:
-        if not data: break
-        data = data + socket.recv(1)
-        len += 1
-        if len > MAX_CLIENT_REQUEST_LENGTH: break
-
-    return data
-
-def doConnect(clientSocket, serverSocket, tamBuffer):
-    sockets = [clientSocket, serverSocket]
-    timeout = 0
-    print '<-> CONNECT started'
-
-    while 1:
-        timeout += 1
-        ins, _, exs = select.select(sockets, [], sockets, 3)
-        if exs: break
-
-        if ins:
-            for socket in ins:
-                try:
-                    data = socket.recv(tamBuffer)
-                    if not data: break;
-
-                    if socket is serverSocket:
-                        clientSocket.sendall(data)
-                    else:
-                        serverSocket.sendall(data)
-
-                    timeout = 0
-                except:
-                    break
-
-        if timeout == 60: break
-
-def acceptThread(clientSocket, clientAddr):
-    print '<-> Client connected: ', clientAddr
-
-    request = receiveHttpMsg(clientSocket)
-
-    if not request.startswith('CONNECT'):
-        print '<!> Client requisitou metodo != CONNECT!'
-        clientSocket.sendall('HTTP/1.1 405 Only_CONNECT_Method!\r\n\r\n')
-        clientSocket.close()
-        thread.exit()
-
-    netData = getRequestNetData(request)
-    protocol = getRequestProtocol(request)
-    hostPort = getRequestHostPort(netData)
-
-    finalRequest = getReplacedPayload(PAYLOAD, netData, hostPort, protocol)
-
-    proxySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    proxySocket.connect((PROXT_ADDR, PROXY_PORT))
-    proxySocket.sendall(finalRequest)
-
-    proxyResponse = receiveHttpMsg(proxySocket)
-
-    print '<-> Status line: ' + getRequestNetData(proxyResponse)
-
-    clientSocket.sendall(proxyResponse)
-
-    if proxyResponse.find('200 ') != -1:
-        doConnect(clientSocket, proxySocket, TAM_BUFFER)
-
-    print '<-> Client ended    : ', clientAddr
-    proxySocket.close()
-    clientSocket.close()
-    thread.exit()
-
-
-#############################__INICIO__########################################
-
-print '\n'
-print '==>Injector.py'
-print '-->Listening   : ' + BIND_ADDR + ':' + str(BIND_PORT)
-print '-->Remote proxy: ' + PROXT_ADDR + ':' + str(PROXY_PORT)
-print '-->Payload     : ' + PAYLOAD
-print '\n'
-
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((BIND_ADDR, BIND_PORT))
-server.listen(1)
-
-print '<-> Server listening... '
-
-#Recebe o cliente e despacha uma thread para atende-lo
-while True:
-    clientSocket, clientAddr = server.accept()
-    thread.start_new_thread(acceptThread, tuple([clientSocket, 
-clientAddr]))
-
-server.close()" > /usr/bin/http-stl
-chmod +x /usr/bin/http-stl
 elif [ "$met" = "https" ]; then
 echo "Masukkan bug" 
 read -p "default bug: $bug2 : " bug
 [ -z "${bug}" ] && bug="$bug2"
-echo "[SSH]
-client = yes
-accept = localhost:69
-connect = $host:$port
-sni = $bug" > /root/akun/ssl.conf
-echo "Host ssl*
-    PermitLocalCommand yes
-    LocalCommand gproxy %h
-    DynamicForward 1080
-    StrictHostKeyChecking no
-    TCPKeepAlive yes
-    ServerAliveInterval 30
-    ServerAliveCountMax 1200
-    GatewayPorts yes
-Host ssl1
-    HostName 127.0.0.1
-    Port 69
-    User $user" > /root/.ssh/config
+modeconfig='2'
+config
+
 elif [ "$met" = "direct" ]; then
 echo "Masukkan payload" 
 read -p "default payload: $payload2 : " payload
 [ -z "${payload}" ] && payload="$payload2"
-cat <<EOF> /root/.brainfuck-tunnel/config/payload.txt
-$payload
+modeconfig='0'
+config
 
-EOF
-cat <<EOF> /root/.brainfuck-tunnel/database/account.json
-{
-  "host": "$host",
-  "port": "$port",
-  "username": "$user",
-  "password": "$pass",
-  "sockport": "1080"
-}
-
-EOF
-cat <<EOF> /root/.brainfuck-tunnel/config/config.json
-{
-  "inject_host": "127.0.0.1",
-  "inject_port": "6969",
-  "tunnel_type": "0",
-
-  "proxy_command": "ncat --proxy-type http --proxy {inject_host}:{inject_port} %host %port",
-  "proxy_command": "nc -X CONNECT -x {inject_host}:{inject_port} %h %p",
-  "proxy_command": "corkscrew {inject_host} {inject_port} %h %p"
-}
-
-EOF
 elif [ "$met" = "sp" ]; then
 echo "Masukkan SNI" 
 read -p "default SNI: $bug2 : " bug
@@ -266,32 +164,14 @@ read -p "default SNI: $bug2 : " bug
 echo "Masukkan payload" 
 read -p "default payload: $payload2 : " payload
 [ -z "${payload}" ] && payload="$payload2"
-cat <<EOF> /root/akun/settings.ini
-[mode]
+modeconfig='3'
+config
 
-connection_mode = 3
-
-[config]
-payload = $payload
-proxyip = 
-proxyport = 
-
-auto_replace = 1
-
-[ssh]
-host = $host
-port = $port
-username = $user
-password = $pass
-
-[sni]
-server_name = $bug   
-
-EOF
 else 
 echo "Anda belum memilih inject http/https/direct"
 exit
 fi
+
 echo "met=$met
 host=$host
 port=$port
@@ -307,68 +187,10 @@ sleep 2
 clear
 stl
 elif [ "${tools}" = "2" ]; then
-ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
-echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
-ip tuntap add dev tun1 mode tun
-ifconfig tun1 10.0.0.1 netmask 255.255.255.0
-clear
-met="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2)" 
-if [ "$met" = "http" ]; then
-user="$(cat /root/akun/stl.txt | grep -i user | cut -d= -f2)" 
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
-port="$(cat /root/akun/stl.txt | grep -i port | cut -d= -f2 | head -n1)" 
-pass="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)" 
-http-stl > /dev/null &
-sleep 1
-screen -d -m sshpass -p $pass ssh -oStrictHostKeyChecking=no -CND :1080 -p "$port" "$user"@"$host" -o "Proxycommand=ncat --proxy-type http --proxy 127.0.0.1:6969 %h %p"
-sleep 5
-gproxy &
-elif [ "$met" = "https" ]; then
-cek="$(ls /root/.ssh/ | grep -i know | cut -d_ -f1)" 
-if [ "$cek" = "known" ]; then
-rm -f /root/.ssh/known*
-fi
-pass="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)" 
-stunnel /root/akun/ssl.conf > /dev/null &
-sleep 1
-sshpass -p $pass ssh -N ssl1 &
-elif [ "$met" = "direct" ]; then
-chmod +x /root/brainfuck
-/root/./brainfuck start > /dev/null &
-sleep 5
-gproxy &
-elif [ "$met" = "sp" ]; then
-python3 /root/akun/tunnel.py &
-sleep 2
-python3 /root/akun/ssh.py 1 &
-sleep 5
-gproxy &
-rm -r /root/logs.txt
-else
-echo "anda belum membuat profile"
-exit
-fi
-echo '
-#!/bin/bash
-#stl (Wegare)
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
-fping -l $host' > /usr/bin/ping-stl
-chmod +x /usr/bin/ping-stl
-/usr/bin/ping-stl > /dev/null 2>&1 &
+start
+
 elif [ "${tools}" = "3" ]; then
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
-route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
-killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass http-stl screen fping python3
-route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
-route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
-route del "$host" gw "$route" metric 0 2>/dev/null
-ip link delete tun1 2>/dev/null
-/etc/init.d/dnsmasq restart 2>/dev/null
-#killall dnsmasq
-chmod +x /root/brainfuck
-/root/./brainfuck stop > /dev/null &
-#/etc/init.d/dnsmasq start > /dev/null
-sleep 2
+stop
 echo "Stop Suksess"
 sleep 2
 clear
@@ -386,6 +208,7 @@ echo "Enable Suksess"
 sleep 2
 clear
 stl
+
 elif [ "${tools}" = "5" ]; then
 sed -i "/^# BEGIN AUTOREKONEKSTL/,/^# END AUTOREKONEKSTL/d" /etc/crontabs/root > /dev/null
 /etc/init.d/cron restart
