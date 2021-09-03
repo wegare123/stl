@@ -38,9 +38,7 @@ wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/mai
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/tunnel.py" -O /root/akun/tunnel.py
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/ssh.py" -O /root/akun/ssh.py
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/inject.py" -O /root/akun/inject.py
-wget --no-check-certificate "https://github.com/wegare123/stl/blob/main/stl/Brainfuck-master.zip?raw=true" -O ~/ekstrak.zip && unzip ~/ekstrak.zip && mv ~/Brainfuck-master/* ~/ && mv ~/Brainfuck-master/.brainfuck-tunnel ~/ && rm -rf ~/ekstrak.zip && rm -rf ~/Brainfuck-master
 opkg install openvpn-openssl && opkg install ip-full && opkg install openssh-client && opkg install stunnel && opkg install *.ipk && opkg install lsof && opkg install fping screen python python3
-chmod +x /root/brainfuck
 chmod +x /usr/bin/gproxy
 chmod +x /usr/bin/stl
 chmod +x /root/akun/tunnel.py
