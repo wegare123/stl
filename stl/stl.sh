@@ -36,7 +36,7 @@ var=`cat /root/logs.txt | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'`
 		gproxy &
 		break
 	else
-		echo "Reconnect 5s"
+		echo "{$i}. Reconnect 5s"
 	fi
 	echo -e "Failed!"
 	stop
