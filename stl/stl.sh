@@ -41,7 +41,7 @@ var=`cat /root/logs.txt | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'`
 	echo -e "Failed!"
 	stop
 done
-rm -r /root/logs.txt
+rm -r /root/logs.txt 2>/dev/null
 
 echo '
 #!/bin/bash
