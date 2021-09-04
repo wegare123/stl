@@ -27,6 +27,8 @@ elif [[ $cek == *"OpenWrt"* ]] && [[ $cek == *"mipsel_24kc"* ]]; then
 wget --no-check-certificate "https://github.com/wegare123/backup/blob/main/openwrt/ramips.zip?raw=true" -O ~/ekstrak.zip && unzip ~/ekstrak.zip && cp ~/ramips/*.ipk ~/ && rm -rf ~/ekstrak.zip && rm -rf ~/ramips
 elif [[ $cek == *"OpenWrt"* ]] && [[ $cek == *"x86"* ]]; then
 wget --no-check-certificate "https://github.com/wegare123/backup/blob/main/openwrt/i386-pentium.zip?raw=true" -O ~/ekstrak.zip && unzip ~/ekstrak.zip && cp ~/i386-pentium/*.ipk ~/ && rm -rf ~/ekstrak.zip && rm -rf ~/i386-pentium
+elif [[ $cek == *"OpenWrt"* ]] && [[ $cek == *"x86_64"* ]]; then
+wget --no-check-certificate "https://github.com/wegare123/backup/blob/main/openwrt/x86_64.zip?raw=true" -O ~/ekstrak.zip && unzip ~/ekstrak.zip && cp ~/x86_64/*.ipk ~/ && rm -rf ~/ekstrak.zip && rm -rf ~/x86_64
 else
 echo -e "version anda tidak terdeteksi!"
 exit
