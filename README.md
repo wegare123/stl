@@ -17,7 +17,7 @@ make defconfig
 make menuconfig
 <br>
 make package/badvpn/compile V=99
-<br>
+<br><br>
 2)corkscrew
 <br>
 git clone https://github.com/pfalcon/openwrt-packages.git
@@ -29,7 +29,7 @@ rm -rf openwrt-packages
 make menuconfig
 <br>
 make package/corkscrew/compile V=99
-<br>
+<br><br>
 3)sshpass
 <br>
 mkdir -p package/sshpass
