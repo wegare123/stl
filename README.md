@@ -4,7 +4,21 @@ Default architecture aarch64_cortex-a53
 Jika berbeda bisa compile sendiri file2 pendukung untuk router/sbc kalian ikuti tutorial dibawah ini:
 <br>
 
-1)badvpn-tun2socks
+1)openwrt-sdk
+<br>
+Contoh download openwrt-sdk untuk architecture aarch64_cortex-a53
+<br>
+openwrt-sdk yang lain bisa download dilink https://downloads.openwrt.org/releases/
+<br>
+Pilih versi openwrt > targets > pilih architecture sesuai dengan router/sbc kalian lalu salin linknya lalu ubah link contoh yang dibawah
+<br>
+wget https://downloads.openwrt.org/releases/21.02.0-rc3/targets/sunxi/cortexa53/openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+<br>
+tar -xf openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+<br>
+cd openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64
+
+2)badvpn-tun2socks
 <br>
 git clone https://github.com/yazdan/tun2socks-Openwrt
 <br>
@@ -18,7 +32,7 @@ make menuconfig
 <br>
 make package/badvpn/compile V=99
 <br><br>
-2)corkscrew
+3)corkscrew
 <br>
 git clone https://github.com/pfalcon/openwrt-packages.git
 <br>
@@ -30,7 +44,7 @@ make menuconfig
 <br>
 make package/corkscrew/compile V=99
 <br><br>
-3)sshpass
+4)sshpass
 <br>
 mkdir -p package/sshpass
 <br>
