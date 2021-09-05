@@ -4,7 +4,7 @@ Default architecture aarch64_cortex-a53
 Jika berbeda bisa compile sendiri file2 pendukung untuk router/sbc kalian ikuti tutorial dibawah ini:
 <br>
 
-1 Badvpn
+1. Badvpn
 git clone https://github.com/yazdan/tun2socks-Openwrt
 <br>
 cp -rf tun2socks-Openwrt/badvpn package/
@@ -16,7 +16,7 @@ make defconfig
 make menuconfig
 <br>
 make package/badvpn/compile V=99
-2 corkscrew
+2. corkscrew
 git clone https://github.com/pfalcon/openwrt-packages.git
 <br>
 cp -rf openwrt-packages/net/corkscrew package/
