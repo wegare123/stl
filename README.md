@@ -30,7 +30,7 @@ make defconfig
 <br>
 make menuconfig
 <br>
-Pilih Network > VPN > <*> badvpn > exit > save
+Pilih Network > VPN > badvpn > exit > save
 <br>
 make package/badvpn/compile V=99
 <br><br>
@@ -44,7 +44,7 @@ rm -rf openwrt-packages
 <br>
 make menuconfig
 <br>
-Pilih Network > SSH > <*> corkscrew > exit > save
+Pilih Network > SSH > corkscrew > exit > save
 <br>
 make package/corkscrew/compile V=99
 <br><br>
@@ -62,7 +62,7 @@ wget --no-check-certificate "https://www.dropbox.com/s/wp4asjlqjp2ah4s/makefile"
 <br>
 make menuconfig
 <br>
-Pilih Utilities > <*> sshpass > exit > save
+Pilih Utilities > sshpass > exit > save
 <br>
 make package/sshpass/compile V=99
 
