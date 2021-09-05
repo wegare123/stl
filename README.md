@@ -6,9 +6,7 @@ Jika berbeda bisa compile sendiri file2 pendukung untuk router/sbc kalian ikuti 
 
 1. Badvpn
 git clone https://github.com/yazdan/tun2socks-Openwrt
-<br>
 cp -rf tun2socks-Openwrt/badvpn package/
-<br>
 rm -rf tun2socks-Openwrt/
 <br>
 make defconfig
