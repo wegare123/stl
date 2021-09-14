@@ -31,7 +31,7 @@ echo "is connecting to the internet"
 for i in {1..3}
 do
 sleep 5
-var=`cat /root/logs.txt | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'`
+var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'`
 	if [ "$var" = "SUCCESSFULLY" ];then 
 		gproxy &
 		break
