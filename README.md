@@ -4,7 +4,10 @@ Default architecture aarch64_cortex-a53
 Jika berbeda bisa compile sendiri file2 pendukung untuk router/sbc kalian ikuti tutorial dibawah ini:
 <br>
 
-1)openwrt-sdk
+1)apt update -y && apt upgrade && apt-get -y install tar build-essential asciidoc binutils bzip2 gawk rsync gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
+<br>
+
+2)openwrt-sdk
 <br>
 Contoh download openwrt-sdk untuk architecture aarch64_cortex-a53
 <br>
@@ -18,7 +21,7 @@ tar -xf openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.
 <br>
 cd openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64
 
-2)badvpn-tun2socks
+3)badvpn-tun2socks
 <br>
 git clone https://github.com/yazdan/tun2socks-Openwrt
 <br>
@@ -34,7 +37,8 @@ Pilih Network > VPN > badvpn > exit > save
 <br>
 make package/badvpn/compile V=99
 <br><br>
-3)corkscrew
+
+4)corkscrew
 <br>
 git clone https://github.com/pfalcon/openwrt-packages.git
 <br>
@@ -48,7 +52,8 @@ Pilih Network > SSH > corkscrew > exit > save
 <br>
 make package/corkscrew/compile V=99
 <br><br>
-4)sshpass
+
+5)sshpass
 <br>
 mkdir -p package/sshpass
 <br>
