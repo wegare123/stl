@@ -21,7 +21,7 @@ tar -xf openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64.tar.
 <br>
 cd openwrt-sdk-21.02.0-rc3-sunxi-cortexa53_gcc-8.4.0_musl.Linux-x86_64
 
-3)badvpn-tun2socks
+3) badvpn-tun2socks
 <br>
 git clone https://github.com/yazdan/tun2socks-Openwrt
 <br>
@@ -38,7 +38,7 @@ Pilih Network > VPN > badvpn > exit > save
 make package/badvpn/compile V=99
 <br><br>
 
-4)corkscrew
+4) corkscrew
 <br>
 git clone https://github.com/pfalcon/openwrt-packages.git
 <br>
@@ -53,7 +53,7 @@ Pilih Network > SSH > corkscrew > exit > save
 make package/corkscrew/compile V=99
 <br><br>
 
-5)sshpass
+5) sshpass
 <br>
 mkdir -p package/sshpass
 <br>
