@@ -39,7 +39,6 @@ var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print 
 		echo "{$i}. Reconnect 5s"
 	fi
 	echo -e "Failed!"
-	stop
 done
 rm -r /root/logs.txt 2>/dev/null
 
