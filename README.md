@@ -4,10 +4,10 @@ Default architecture aarch64_cortex-a53
 Jika berbeda bisa compile sendiri file2 pendukung untuk router/sbc kalian ikuti tutorial dibawah ini:
 <br>
 
-1)apt update -y && apt upgrade && apt-get -y install tar build-essential asciidoc binutils bzip2 gawk rsync gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
+1) apt update -y && apt upgrade && apt-get -y install tar build-essential asciidoc binutils bzip2 gawk rsync gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
 <br>
 
-2)openwrt-sdk
+2) openwrt-sdk
 <br>
 Contoh download openwrt-sdk untuk architecture aarch64_cortex-a53
 <br>
