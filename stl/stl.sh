@@ -10,7 +10,28 @@ pp2="$(cat /root/akun/stl.txt | grep -i pp | cut -d= -f2 | tail -n1)"
 payload2="$(cat /root/akun/stl.txt | grep -i payload | cut -d= -f2)" 
 proxy2="$(cat /root/akun/stl.txt | grep -i proxy | cut -d= -f2)" 
 met2="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2 | head -n1)" 
+pillstl2="$(cat /root/akun/pillstl.txt)"
 clear
+
+tunnel () {
+nohup python3 /root/akun/tunnel.py > /dev/null 2>&1 &
+sleep 1
+nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
+echo "is connecting to the internet"
+for i in {1..3}
+do
+sleep 3
+var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'|tail -n1`
+	if [ "$var" = "SUCCESSFULLY" ];then 
+		gproxy
+		break
+	else
+		echo "{$i}. Reconnect 5s"
+		nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
+	fi
+	echo -e "Failed!"
+done
+}
 
 start () {
 cek="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
@@ -19,47 +40,50 @@ echo "anda belum membuat profile"
 exit
 fi
 stop
+pillstl="$(cat /root/akun/pillstl.txt)"
+if [[ $pillstl = "1" ]]; then
 ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
 echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
+host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
+route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
 ip tuntap add dev tun1 mode tun
 ifconfig tun1 10.0.0.1 netmask 255.255.255.0
-clear
-nohup python3 /root/akun/tunnel.py > /dev/null 2>&1 &
-sleep 1
-nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
-echo "is connecting to the internet"
-for i in {1..3}
-do
-sleep 5
-var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'|tail -n1`
-	if [ "$var" = "SUCCESSFULLY" ];then 
-		gproxy &
-		break
-	else
-		echo "{$i}. Reconnect 5s"
-		nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
-	fi
-	echo -e "Failed!"
-done
+tunnel
+route add 8.8.8.8 gw $route metric 0
+route add 8.8.4.4 gw $route metric 0
+route add $host gw $route metric 0
+route add default gw 10.0.0.2 metric 0
+elif [[ $pillstl = "2" ]]; then
+tunnel
+fi
+
 rm -r /root/logs.txt 2>/dev/null
 
 echo '
 #!/bin/bash
 #stl (Wegare)
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
-fping -l $host' > /usr/bin/ping-stl
+httping youtube.com &' > /usr/bin/ping-stl
 chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 }
 
 stop () {
+pillstl="$(cat /root/akun/pillstl.txt)"
+if [[ $pillstl = "1" ]]; then
 host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
-killall -q badvpn-tun2socks ssh ping-stl stunnel sshpass screen fping python3
+killall -q badvpn-tun2socks ssh ping-stl sshpass httping python3
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
+elif [[ $pillstl = "2" ]]; then
+iptables -t nat -D OUTPUT -j PROXY 2>/dev/null
+iptables -t nat -F PROXY 2>/dev/null
+iptables -t nat -X PROXY 2>/dev/null
+iptables -t nat -F PREROUTING 2>/dev/null
+killall -q redsocks python3 ssh ping-stl sshpass httping fping screen
+fi
 /etc/init.d/dnsmasq restart 2>/dev/null
 }
 
@@ -128,6 +152,70 @@ echo "Masukkan port udpgw"
 read -p "default udpgw: $udp2 : " udp
 [ -z "${udp}" ] && udp="$udp2"
 
+echo "Pilih Socks Proxy" 
+echo "1. Badvpn-Tun2socks" 
+echo "2. Tranparent Proxy" 
+read -p "Pilih Angka : " pillstl
+if [ "$pillstl" = "1" ]; then
+badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &"
+elif [ "$pillstl" = "2" ]; then
+cat <<EOF> /etc/redsocks.conf
+base {
+	log_debug = off;
+	log_info = off;
+	redirector = iptables;
+}
+redsocks {
+	local_ip = 0.0.0.0;
+	local_port = 8123;
+	ip = 127.0.0.1;
+	port = 1080;
+	type = socks5;
+}
+redsocks {
+	local_ip = 127.0.0.1;
+	local_port = 8124;
+	ip = 10.0.0.1;
+	port = 1080;
+	type = socks5;
+}
+redudp {
+    local_ip = 127.0.0.1; 
+    local_port = $udp;
+    ip = 10.0.0.1;
+    port = 1080;
+    dest_ip = 8.8.8.8; 
+    dest_port = 53; 
+    udp_timeout = 30;
+    udp_timeout_stream = 180;
+}
+dnstc {
+	local_ip = 127.0.0.1;
+	local_port = 5300;
+}
+EOF
+badvpn="#!/bin/bash
+#stl (Wegare)
+iptables -t nat -N PROXY 2>/dev/null
+iptables -t nat -I OUTPUT -j PROXY
+iptables -t nat -A PREROUTING -i br-lan -p tcp -j PROXY
+iptables -t nat -A PROXY -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A PROXY -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A PROXY -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A PROXY -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A PROXY -p tcp -j REDIRECT --to-ports 8123
+iptables -t nat -A PROXY -p tcp -j REDIRECT --to-ports 8124
+iptables -t nat -A PROXY -p udp --dport 53 -j REDIRECT --to-ports $udp
+redsocks -c /etc/redsocks.conf -p /var/run/redsocks.pid &
+"
+else
+echo "Anda belum memilih socks proxy"
+exit
+fi
+cat <<EOF> /usr/bin/gproxy
+$badvpn
+EOF
+chmod +x /usr/bin/gproxy
 if [ "$met" = "http" ]; then
 echo "Masukkan payload" 
 read -p "default payload: $payload2 : " payload
@@ -182,6 +270,7 @@ payload=$payload
 proxy=$proxy
 pp=$pp
 bug=$bug" > /root/akun/stl.txt
+echo "$pillstl" > /root/akun/pillstl.txt
 echo "Sett Profile Sukses"
 sleep 2
 clear

@@ -40,7 +40,7 @@ wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/mai
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/tunnel.py" -O /root/akun/tunnel.py
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/ssh.py" -O /root/akun/ssh.py
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/inject.py" -O /root/akun/inject.py
-opkg install openvpn-openssl && opkg install ip-full && opkg install openssh-client && opkg install stunnel && opkg install --force-depends *.ipk && opkg install lsof && opkg install fping screen python python3 coreutils-nohup
+opkg install openvpn-openssl && opkg install ip-full && opkg install openssh-client && opkg install stunnel && opkg install --force-depends *.ipk && opkg install lsof && opkg install httping fping screen python python3 coreutils-nohup libevent2 redsocks
 chmod +x /usr/bin/gproxy
 chmod +x /usr/bin/stl
 chmod +x /root/akun/tunnel.py
