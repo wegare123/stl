@@ -170,14 +170,14 @@ redsocks {
 	local_port = 8123;
 	ip = 127.0.0.1;
 	port = 1080;
-	type = socks5;
+	type = socks4;
 }
 redsocks {
 	local_ip = 127.0.0.1;
 	local_port = 8124;
 	ip = 10.0.0.1;
 	port = 1080;
-	type = socks5;
+	type = socks4;
 }
 redudp {
     local_ip = 127.0.0.1; 
@@ -197,7 +197,6 @@ EOF
 badvpn="#!/bin/bash
 #stl (Wegare)
 iptables -t nat -N PROXY 2>/dev/null
-iptables -t nat -I OUTPUT -j PROXY
 iptables -t nat -A PREROUTING -i br-lan -p tcp -j PROXY
 iptables -t nat -A PROXY -d 127.0.0.0/8 -j RETURN
 iptables -t nat -A PROXY -d 192.168.0.0/16 -j RETURN
