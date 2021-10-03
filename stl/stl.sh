@@ -23,7 +23,7 @@ do
 sleep 3
 var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print $4}'|tail -n1`
 	if [ "$var" = "SUCCESSFULLY" ];then 
-		gproxy
+		gproxy &
 		break
 	else
 		echo "{$i}. Reconnect 5s"
@@ -56,13 +56,12 @@ route add default gw 10.0.0.2 metric 0
 elif [[ $pillstl = "2" ]]; then
 tunnel
 fi
-
 rm -r /root/logs.txt 2>/dev/null
-
 echo '
 #!/bin/bash
 #stl (Wegare)
-httping youtube.com &' > /usr/bin/ping-stl
+host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
+fping -l $host' > /usr/bin/ping-stl
 chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 }
@@ -78,9 +77,8 @@ route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
 elif [[ $pillstl = "2" ]]; then
-iptables -t nat -D OUTPUT -j PROXY 2>/dev/null
+iptables -t nat -F OUTPUT 2>/dev/null
 iptables -t nat -F PROXY 2>/dev/null
-iptables -t nat -X PROXY 2>/dev/null
 iptables -t nat -F PREROUTING 2>/dev/null
 killall -q redsocks python3 ssh ping-stl sshpass httping fping screen
 fi
@@ -164,20 +162,22 @@ base {
 	log_debug = off;
 	log_info = off;
 	redirector = iptables;
+	redsocks_conn_max = 10000000000000000000000000000000000000000000000000000000000000;
+	rlimit_nofile = 10240;
 }
 redsocks {
 	local_ip = 0.0.0.0;
 	local_port = 8123;
 	ip = 127.0.0.1;
 	port = 1080;
-	type = socks4;
+	type = socks5;
 }
 redsocks {
 	local_ip = 127.0.0.1;
 	local_port = 8124;
 	ip = 10.0.0.1;
 	port = 1080;
-	type = socks4;
+	type = socks5;
 }
 redudp {
     local_ip = 127.0.0.1; 
