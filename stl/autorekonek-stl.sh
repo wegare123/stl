@@ -12,7 +12,7 @@ echo $route
     elif [[ -z $route3 ]]; then
            printf '\n' | stl
            exit
-    elif [[ $route4 -gt '5' ]]; then
+    elif [[ $route4 -gt '4' ]]; then
            printf '\n' | stl
            exit
     else 

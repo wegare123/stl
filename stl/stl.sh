@@ -60,8 +60,10 @@ rm -r /root/logs.txt 2>/dev/null
 echo '
 #!/bin/bash
 #stl (Wegare)
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
-fping -l $host' > /usr/bin/ping-stl
+while :
+do
+httping m.google.com
+done' > /usr/bin/ping-stl
 chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 }
