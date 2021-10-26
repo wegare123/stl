@@ -164,7 +164,7 @@ base {
 	log_debug = off;
 	log_info = off;
 	redirector = iptables;
-	redsocks_conn_max = 10000000000000000000000000000000000000000000000000000000000000;
+	redsocks_conn_max = 10000;
 	rlimit_nofile = 10240;
 }
 redsocks {
