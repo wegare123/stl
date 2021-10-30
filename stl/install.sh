@@ -31,7 +31,7 @@ elif [[ $cek == *"OpenWrt"* ]] && [[ $cek == *"x86_64"* ]]; then
 wget --no-check-certificate "https://github.com/wegare123/backup/blob/main/openwrt/x86_64.zip?raw=true" -O ~/ekstrak.zip && unzip ~/ekstrak.zip && cp ~/x86_64/*.ipk ~/ && rm -rf ~/ekstrak.zip && rm -rf ~/x86_64
 else
 echo -e "version anda tidak terdeteksi!"
-exit
+echo -e "silahkan install sendiri paket pendukungnya!"
 fi
 mkdir -p ~/akun/
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/stl.sh" -O /usr/bin/stl
