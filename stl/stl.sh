@@ -1,15 +1,15 @@
 #!/bin/bash
 #stl (Wegare)
-udp2="$(cat /root/akun/stl.txt | grep -i udp | cut -d= -f2)" 
-user2="$(cat /root/akun/stl.txt | grep -i user | cut -d= -f2 | head -n1)" 
-host2="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
-port2="$(cat /root/akun/stl.txt | grep -i port | cut -d= -f2 | head -n1)" 
-bug2="$(cat /root/akun/stl.txt | grep -i bug | cut -d= -f2)" 
-pass2="$(cat /root/akun/stl.txt | grep -i pass | cut -d= -f2)" 
-pp2="$(cat /root/akun/stl.txt | grep -i pp | cut -d= -f2 | tail -n1)" 
-payload2="$(cat /root/akun/stl.txt | grep -i payload | cut -d= -f2)" 
-proxy2="$(cat /root/akun/stl.txt | grep -i proxy | cut -d= -f2)" 
-met2="$(cat /root/akun/stl.txt | grep -i met | cut -d= -f2 | head -n1)" 
+met2="$(cat /root/akun/stl.txt | awk 'NR==1')" 
+host2="$(cat /root/akun/stl.txt | awk 'NR==2')"
+port2="$(cat /root/akun/stl.txt | awk 'NR==3')" 
+user2="$(cat /root/akun/stl.txt | awk 'NR==4')" 
+pass2="$(cat /root/akun/stl.txt | awk 'NR==5')" 
+udp2="$(cat /root/akun/stl.txt | awk 'NR==6')" 
+payload2="$(cat /root/akun/stl.txt | awk 'NR==7')" 
+proxy2="$(cat /root/akun/stl.txt | awk 'NR==8')" 
+pp2="$(cat /root/akun/stl.txt | awk 'NR==9')" 
+bug2="$(cat /root/akun/stl.txt | awk 'NR==10')" 
 pillstl2="$(cat /root/akun/pillstl.txt)"
 clear
 
@@ -26,7 +26,7 @@ var=`cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY"|awk '{print 
 		gproxy &
 		break
 	else
-		echo "{$i}. Reconnect 5s"
+		echo "{$i}. Reconnect 3s"
 		nohup python3 /root/akun/ssh.py 1 > /dev/null 2>&1 &
 	fi
 	echo -e "Failed!"
@@ -44,7 +44,7 @@ pillstl="$(cat /root/akun/pillstl.txt)"
 if [[ $pillstl = "1" ]]; then
 ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
 echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
+host="$(cat /root/akun/stl.txt | awk 'NR==2')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
 ip tuntap add dev tun1 mode tun
 ifconfig tun1 10.0.0.1 netmask 255.255.255.0
@@ -60,10 +60,7 @@ rm -r /root/logs.txt 2>/dev/null
 echo '
 #!/bin/bash
 #stl (Wegare)
-while :
-do
-httping m.google.com
-done' > /usr/bin/ping-stl
+httping m.google.com' > /usr/bin/ping-stl
 chmod +x /usr/bin/ping-stl
 /usr/bin/ping-stl > /dev/null 2>&1 &
 }
@@ -71,7 +68,7 @@ chmod +x /usr/bin/ping-stl
 stop () {
 pillstl="$(cat /root/akun/pillstl.txt)"
 if [[ $pillstl = "1" ]]; then
-host="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)" 
+host="$(cat /root/akun/stl.txt | awk 'NR==2')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
 killall -q badvpn-tun2socks ssh ping-stl sshpass httping python3
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
@@ -129,33 +126,35 @@ echo "https    = ssl/tls direct"
 echo "direct   = ssh direct + payload" 
 echo "sp       = ssl/tls + payload" 
 echo "" 
-read -p "default inject: $met2 : " met
+read -p "default inject ($met2) : " met
 [ -z "${met}" ] && met="$met2"
 
 echo "Masukkan host/ip" 
-read -p "default host/ip: $host2 : " host
+read -p "default host/ip ($host2) : " host
 [ -z "${host}" ] && host="$host2"
 
 echo "Masukkan port" 
-read -p "default port: $port2 : " port
+read -p "default port ($port2) : " port
 [ -z "${port}" ] && port="$port2"
 
 echo "Masukkan user" 
-read -p "default user: $user2 : " user
+read -p "default user ($user2) : " user
 [ -z "${user}" ] && user="$user2"
 
 echo "Masukkan pass" 
-read -p "default pass: $pass2 : " pass
+read -p "default pass ($pass2) : " pass
 [ -z "${pass}" ] && pass="$pass2"
 
 echo "Masukkan port udpgw" 
-read -p "default udpgw: $udp2 : " udp
+read -p "default udpgw ($udp2) : " udp
 [ -z "${udp}" ] && udp="$udp2"
 
 echo "Pilih Socks Proxy" 
 echo "1. Badvpn-Tun2socks" 
 echo "2. Tranparent Proxy" 
-read -p "Pilih Angka : " pillstl
+read -p "default Socks Proxy ($pillstl2) : " pillstl
+[ -z "${pillstl}" ] && pillstl="$pillstl2"
+
 if [ "$pillstl" = "1" ]; then
 badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &"
 elif [ "$pillstl" = "2" ]; then
@@ -164,8 +163,6 @@ base {
 	log_debug = off;
 	log_info = off;
 	redirector = iptables;
-	redsocks_conn_max = 10000;
-	rlimit_nofile = 10240;
 }
 redsocks {
 	local_ip = 0.0.0.0;
@@ -219,39 +216,39 @@ EOF
 chmod +x /usr/bin/gproxy
 if [ "$met" = "http" ]; then
 echo "Masukkan payload" 
-read -p "default payload: $payload2 : " payload
+read -p "default payload ($payload2) : " payload
 [ -z "${payload}" ] && payload="$payload2"
 
 echo "Masukkan proxy" 
-read -p "default proxy: $proxy2 : " proxy
+read -p "default proxy ($proxy2) : " proxy
 [ -z "${proxy}" ] && proxy="$proxy2"
 
 echo "Masukkan port proxy" 
-read -p "default port: $pp2 : " pp
+read -p "default port ($pp2) : " pp
 [ -z "${pp}" ] && pp="$pp2"
 modeconfig='1'
 config
 
 elif [ "$met" = "https" ]; then
 echo "Masukkan bug" 
-read -p "default bug: $bug2 : " bug
+read -p "default bug ($bug2) : " bug
 [ -z "${bug}" ] && bug="$bug2"
 modeconfig='2'
 config
 
 elif [ "$met" = "direct" ]; then
 echo "Masukkan payload" 
-read -p "default payload: $payload2 : " payload
+read -p "default payload ($payload2) : " payload
 [ -z "${payload}" ] && payload="$payload2"
 modeconfig='0'
 config
 
 elif [ "$met" = "sp" ]; then
 echo "Masukkan SNI" 
-read -p "default SNI: $bug2 : " bug
+read -p "default SNI ($bug2) : " bug
 [ -z "${bug}" ] && bug="$bug2"
 echo "Masukkan payload" 
-read -p "default payload: $payload2 : " payload
+read -p "default payload ($payload2) : " payload
 [ -z "${payload}" ] && payload="$payload2"
 modeconfig='3'
 config
@@ -261,16 +258,28 @@ echo "Anda belum memilih inject http/https/direct"
 exit
 fi
 
-echo "met=$met
-host=$host
-port=$port
-user=$user
-pass=$pass
-udp=$udp
-payload=$payload
-proxy=$proxy
-pp=$pp
-bug=$bug" > /root/akun/stl.txt
+if [[ -z $udp ]]; then
+udp="-"
+fi
+if [[ -z $payload ]]; then
+payload="-"
+fi
+if [[ -z $proxy ]]; then
+proxy="-"
+fi
+if [[ -z $pp ]]; then
+pp="-"
+fi
+echo "$met
+$host
+$port
+$user
+$pass
+$udp
+$payload
+$proxy
+$pp
+$bug" > /root/akun/stl.txt
 echo "$pillstl" > /root/akun/pillstl.txt
 echo "Sett Profile Sukses"
 sleep 2
