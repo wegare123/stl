@@ -34,7 +34,7 @@ done
 }
 
 start () {
-cek="$(cat /root/akun/stl.txt | grep -i host | cut -d= -f2 | head -n1)"
+cek="$(cat /root/akun/stl.txt | awk 'NR==2')"
 if [[ -z $cek ]]; then
 echo "anda belum membuat profile"
 exit
