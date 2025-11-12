@@ -49,8 +49,8 @@ route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
 ip tuntap add dev tun1 mode tun
 ifconfig tun1 10.0.0.1 netmask 255.255.255.0
 tunnel
-route add 8.8.8.8 gw $route metric 0
-route add 8.8.4.4 gw $route metric 0
+route add 1.1.1.1 gw $route metric 0
+route add 1.0.0.1 gw $route metric 0
 route add $host gw $route metric 0
 route add $proxy2 gw $route metric 0 2>/dev/null
 route add default gw 10.0.0.2 metric 0
@@ -72,8 +72,8 @@ if [[ $pillstl = "1" ]]; then
 host="$(cat /root/akun/stl.txt | awk 'NR==2')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
 killall -q badvpn-tun2socks ssh ping-stl sshpass httping python3
-route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
-route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
+route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
+route del 1.0.0.1 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
 route del "$proxy2" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
@@ -185,7 +185,7 @@ redudp {
     local_port = $udp;
     ip = 10.0.0.1;
     port = 1080;
-    dest_ip = 8.8.8.8; 
+    dest_ip = 1.1.1.1; 
     dest_port = 53; 
     udp_timeout = 30;
     udp_timeout_stream = 180;
