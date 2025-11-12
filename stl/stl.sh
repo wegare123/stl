@@ -52,6 +52,7 @@ tunnel
 route add 8.8.8.8 gw $route metric 0
 route add 8.8.4.4 gw $route metric 0
 route add $host gw $route metric 0
+route add $proxy2 gw $route metric 0 2>/dev/null
 route add default gw 10.0.0.2 metric 0
 elif [[ $pillstl = "2" ]]; then
 tunnel
@@ -74,6 +75,7 @@ killall -q badvpn-tun2socks ssh ping-stl sshpass httping python3
 route del 8.8.8.8 gw "$route" metric 0 2>/dev/null
 route del 8.8.4.4 gw "$route" metric 0 2>/dev/null
 route del "$host" gw "$route" metric 0 2>/dev/null
+route del "$proxy2" gw "$route" metric 0 2>/dev/null
 ip link delete tun1 2>/dev/null
 elif [[ $pillstl = "2" ]]; then
 iptables -t nat -F OUTPUT 2>/dev/null
