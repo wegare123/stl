@@ -58,12 +58,12 @@ elif [[ $pillstl = "2" ]]; then
 tunnel
 fi
 rm -r /root/logs.txt 2>/dev/null
-echo '
-#!/bin/bash
-#stl (Wegare)
-httping m.google.com' > /usr/bin/ping-stl
-chmod +x /usr/bin/ping-stl
-/usr/bin/ping-stl > /dev/null 2>&1 &
+#echo '
+##!/bin/bash
+##stl (Wegare)
+#httping m.google.com' > /usr/bin/ping-stl
+#chmod +x /usr/bin/ping-stl
+#/usr/bin/ping-stl > /dev/null 2>&1 &
 }
 
 stop () {
