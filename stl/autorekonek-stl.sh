@@ -12,7 +12,7 @@ while true; do
        if [[ -z $cek_ssh ]]; then
               killall -q ssh sshpass
               nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-              sleep 3
+              sleep 1
               var_cek=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
               if [ "$var_cek" = "SUCCESSFULLY" ]; then
                      rm -r /root/logs.txt 2>/dev/null
@@ -24,7 +24,7 @@ while true; do
               else
                      killall -q ssh sshpass
                      nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-                     sleep 3
+                     sleep 1
                      var_cek=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
                      if [ "$var_cek" = "SUCCESSFULLY" ]; then
                             rm -r /root/logs.txt 2>/dev/null
@@ -38,7 +38,7 @@ while true; do
               if [[ -z $cek_badvpn ]]; then
                      killall -q badvpn-tun2socks
                      gproxy
-                     sleep 3
+                     sleep 1
               fi
        elif [[ $pillstl = "2" ]]; then
               cek_redsocks="$(netstat -plantu | grep -i redsocks)"
@@ -48,8 +48,13 @@ while true; do
                      iptables -t nat -F PREROUTING 2>/dev/null
                      killall -q redsocks
                      gproxy
-                     sleep 3
+                     sleep 1
               fi
        fi
-       sleep 1
+
+       cek_route1="$(route | grep -i 10.0.0.2 | head -n1 | awk '{print $2}')"
+       if [[ -z $cek_route1 ]]; then
+              route add default gw 10.0.0.2 metric 0 2>/dev/null
+              sleep 1
+       fi
 done
