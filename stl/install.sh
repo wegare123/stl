@@ -35,7 +35,6 @@ echo -e "silahkan install sendiri paket pendukungnya!"
 fi
 mkdir -p ~/akun/
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/stl.sh" -O /usr/bin/stl
-wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/gproxy.sh" -O /usr/bin/gproxy
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/autorekonek-stl.sh" -O /usr/bin/autorekonek-stl
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/tunnel.py" -O /root/akun/tunnel.py
 wget --no-check-certificate "https://raw.githubusercontent.com/wegare123/stl/main/stl/ssh.py" -O /root/akun/ssh.py
