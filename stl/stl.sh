@@ -25,7 +25,7 @@ tunnel() {
 		if $LISTCMD 2>/dev/null | grep -i python3 | grep -i 9092 | grep -i listen >/dev/null 2>&1; then
 			break
 		fi
-		killall -q python3
+		#killall -q python3
 		nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
 		sleep 1
 	done

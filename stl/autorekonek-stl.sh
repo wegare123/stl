@@ -3,7 +3,7 @@
 while true; do
        cek_tunnel="$(netstat -plantu | grep -i python3 | grep -i 9092 | grep -i listen)"
        if [[ -z $cek_tunnel ]]; then
-              killall -q python3
+              #killall -q python3
               nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
               sleep 1
        fi
@@ -36,7 +36,7 @@ while true; do
        if [[ $pillstl = "1" ]]; then
               cek_badvpn="$(netstat -plantu | grep -i badvpn)"
               if [[ -z $cek_badvpn ]]; then
-                     killall -q badvpn-tun2socks
+                     #killall -q badvpn-tun2socks
                      gproxy
                      sleep 1
               fi
@@ -46,7 +46,7 @@ while true; do
                      iptables -t nat -F OUTPUT 2>/dev/null
                      iptables -t nat -F PROXY 2>/dev/null
                      iptables -t nat -F PREROUTING 2>/dev/null
-                     killall -q redsocks
+                     #killall -q redsocks
                      gproxy
                      sleep 1
               fi
