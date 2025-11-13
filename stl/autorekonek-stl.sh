@@ -10,7 +10,7 @@ while true; do
 
        cek_ssh="$(netstat -plantu | grep -i ssh | grep -i 1080 | grep -i listen)"
        if [[ -z $cek_ssh ]]; then
-              killall -q ssh sshpass
+              #killall -q ssh sshpass
               nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
               sleep 1
               var_cek=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
@@ -22,7 +22,7 @@ while true; do
               if [[ -z $var ]]; then
                      echo >/dev/null
               else
-                     killall -q ssh sshpass
+                     #killall -q ssh sshpass
                      nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
                      sleep 1
                      var_cek=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)

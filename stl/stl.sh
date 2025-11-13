@@ -35,7 +35,7 @@ tunnel() {
 		if $LISTCMD 2>/dev/null | grep -i ssh | grep -i 1080 | grep -i listen >/dev/null 2>&1; then
 			break
 		fi
-		killall -q ssh sshpass
+		#killall -q ssh sshpass
 		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		sleep 1
 	done
@@ -48,7 +48,7 @@ tunnel() {
 			break
 		else
 			echo "{$i}. Reconnect 3s"
-			killall -q ssh sshpass
+			#killall -q ssh sshpass
 			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		fi
 		echo -e "Failed!"
