@@ -25,10 +25,24 @@ while true; do
               fi
        fi
 
-       cek_badvpn="$(netstat -plantu | grep -i badvpn)"
-       if [[ -z $cek_badvpn ]]; then
-              killall -q badvpn-tun2socks
-              gproxy
-              sleep 3
+       pillstl="$(cat /root/akun/pillstl.txt)"
+       if [[ $pillstl = "1" ]]; then
+              cek_badvpn="$(netstat -plantu | grep -i badvpn)"
+              if [[ -z $cek_badvpn ]]; then
+                     killall -q badvpn-tun2socks
+                     gproxy
+                     sleep 3
+              fi
+       elif [[ $pillstl = "2" ]]; then
+              cek_redsocks="$(netstat -plantu | grep -i redsocks)"
+              if [[ -z $cek_redsocks ]]; then
+                     iptables -t nat -F OUTPUT 2>/dev/null
+                     iptables -t nat -F PROXY 2>/dev/null
+                     iptables -t nat -F PREROUTING 2>/dev/null
+                     killall -q redsocks
+                     gproxy
+                     sleep 3
+              fi
        fi
+       sleep 1
 done
