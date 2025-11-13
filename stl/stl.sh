@@ -17,12 +17,12 @@ tunnel() {
 	nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
 	sleep 1
 	nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+	echo "is connecting to the internet"
 	for i in {1..3}; do
 		sleep 3
 		var=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
 		if [ "$var" = "SUCCESSFULLY" ]; then
-			gproxy >/dev/null 2>&1 &
-			echo "is connecting to the internet"
+			gproxy >/dev/null 2>&1
 			break
 		else
 			echo "{$i}. Reconnect 3s"
@@ -61,6 +61,7 @@ start() {
 	if [[ -z $cek_autorekonek ]]; then
 		autorekonek-stl >/dev/null 2>&1 &
 	fi
+	echo "Connected"
 	#echo '
 	##!/bin/bash
 	##stl (Wegare)
