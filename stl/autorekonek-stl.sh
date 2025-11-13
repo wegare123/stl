@@ -1,9 +1,15 @@
 #!/bin/bash
 #stl (Wegare)
 while true; do
-       route1="$(netstat -plantu | grep -i ssh | grep -i 1080 | grep -i listen)"
-       var="$(cat /root/logs.txt 2>/dev/null)"
-       if [[ -z $route1 ]]; then
+       cek_tunnel="$(netstat -plantu | grep -i python3 | grep -i 9092 | grep -i listen)"
+       if [[ -z $cek_tunnel ]]; then
+              killall -q python3
+              nohup python3 /root/akun/tunnel.py 1 >/dev/null 2>&1 &
+              sleep 1
+       fi
+
+       cek_ssh="$(netstat -plantu | grep -i ssh | grep -i 1080 | grep -i listen)"
+       if [[ -z $cek_ssh ]]; then
               killall -q ssh sshpass
               nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
               sleep 3
@@ -12,6 +18,7 @@ while true; do
                      rm -r /root/logs.txt 2>/dev/null
               fi
        else
+              var="$(cat /root/logs.txt 2>/dev/null)"
               if [[ -z $var ]]; then
                      echo >/dev/null
               else
