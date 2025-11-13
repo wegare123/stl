@@ -26,7 +26,7 @@ tunnel() {
 			break
 		fi
 		killall -q python3
-		nohup python3 /root/akun/tunnel.py 1 >/dev/null 2>&1 &
+		nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
 		sleep 1
 	done
 	sleep 1

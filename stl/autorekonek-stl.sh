@@ -4,7 +4,7 @@ while true; do
        cek_tunnel="$(netstat -plantu | grep -i python3 | grep -i 9092 | grep -i listen)"
        if [[ -z $cek_tunnel ]]; then
               killall -q python3
-              nohup python3 /root/akun/tunnel.py 1 >/dev/null 2>&1 &
+              nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
               sleep 1
        fi
 
