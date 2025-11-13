@@ -17,7 +17,20 @@ tunnel() {
 	nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
 	sleep 1
 	nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-	echo "is connecting to the internet"
+	if command -v netstat >/dev/null 2>&1; then
+		LISTCMD="netstat -plantu"
+	else
+		LISTCMD="ss -plantu"
+	fi
+
+	while true; do
+		if $LISTCMD 2>/dev/null | grep -i ssh | grep -i 1080 | grep -i listen >/dev/null 2>&1; then
+			echo "is connecting to the internet"
+			break
+		fi
+		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+		sleep 3
+	done
 	for i in {1..3}; do
 		sleep 3
 		var=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
@@ -86,8 +99,8 @@ stop() {
 		iptables -t nat -F OUTPUT 2>/dev/null
 		iptables -t nat -F PROXY 2>/dev/null
 		iptables -t nat -F PREROUTING 2>/dev/null
-		#killall -q redsocks python3 ssh ping-stl sshpass httping screen
-		killall -q redsocks python3 ssh sshpass screen autorekonek-stl
+		#killall -q redsocks python3 ssh ping-stl sshpass httping
+		killall -q redsocks python3 ssh sshpass autorekonek-stl
 	fi
 	/etc/init.d/dnsmasq restart 2>/dev/null
 }
