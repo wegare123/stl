@@ -22,14 +22,14 @@ tunnel() {
 	else
 		LISTCMD="ss -plantu"
 	fi
-
 	while true; do
 		if $LISTCMD 2>/dev/null | grep -i ssh | grep -i 1080 | grep -i listen >/dev/null 2>&1; then
 			echo "is connecting to the internet"
 			break
 		fi
+		killall -q ssh sshpass
 		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-		sleep 3
+		sleep 1
 	done
 	for i in {1..3}; do
 		sleep 3
@@ -40,6 +40,7 @@ tunnel() {
 			break
 		else
 			echo "{$i}. Reconnect 3s"
+			killall -q ssh sshpass
 			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		fi
 		echo -e "Failed!"
