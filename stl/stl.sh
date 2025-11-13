@@ -22,7 +22,8 @@ tunnel() {
 		sleep 3
 		var=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
 		if [ "$var" = "SUCCESSFULLY" ]; then
-			gproxy >/dev/null 2>&1
+			gproxy
+			echo "Connected"
 			break
 		else
 			echo "{$i}. Reconnect 3s"
@@ -61,7 +62,6 @@ start() {
 	if [[ -z $cek_autorekonek ]]; then
 		autorekonek-stl >/dev/null 2>&1 &
 	fi
-	echo "Connected"
 	#echo '
 	##!/bin/bash
 	##stl (Wegare)
@@ -164,7 +164,7 @@ if [ "$tools" = "1" ]; then
 	[ -z "${pillstl}" ] && pillstl="$pillstl2"
 
 	if [ "$pillstl" = "1" ]; then
-		badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns &"
+		badvpn="badvpn-tun2socks --tundev tun1 --netif-ipaddr 10.0.0.2 --netif-netmask 255.255.255.0 --socks-server-addr 127.0.0.1:1080 --udpgw-remote-server-addr 127.0.0.1:$udp --udpgw-connection-buffer-size 65535 --udpgw-transparent-dns >/dev/null 2>&1 &"
 	elif [ "$pillstl" = "2" ]; then
 		cat <<EOF >/etc/redsocks.conf
 base {
@@ -212,7 +212,7 @@ iptables -t nat -A PROXY -d 10.0.0.0/8 -j RETURN
 iptables -t nat -A PROXY -p tcp -j REDIRECT --to-ports 8123
 iptables -t nat -A PROXY -p tcp -j REDIRECT --to-ports 8124
 iptables -t nat -A PROXY -p udp --dport 53 -j REDIRECT --to-ports $udp
-redsocks -c /etc/redsocks.conf -p /var/run/redsocks.pid &
+redsocks -c /etc/redsocks.conf -p /var/run/redsocks.pid >/dev/null 2>&1 &
 "
 	else
 		echo "Anda belum memilih socks proxy"
