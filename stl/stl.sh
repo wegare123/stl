@@ -31,14 +31,6 @@ tunnel() {
 	done
 	sleep 1
 	nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-	while true; do
-		if $LISTCMD 2>/dev/null | grep -i ssh | grep -i 1080 | grep -i listen >/dev/null 2>&1; then
-			break
-		fi
-		#killall -q ssh sshpass
-		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-		sleep 1
-	done
 	for i in {1..3}; do
 		sleep 3
 		var=$(cat /root/logs.txt 2>/dev/null | grep "CONNECTED SUCCESSFULLY" | awk '{print $4}' | tail -n1)
@@ -52,6 +44,7 @@ tunnel() {
 			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		fi
 		echo -e "Failed!"
+		exit
 	done
 }
 
