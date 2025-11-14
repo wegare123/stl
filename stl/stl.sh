@@ -14,21 +14,8 @@ pillstl2="$(cat /root/akun/pillstl.txt)"
 clear
 
 tunnel() {
-	if command -v netstat >/dev/null 2>&1; then
-		LISTCMD="netstat -plantu"
-	else
-		LISTCMD="ss -plantu"
-	fi
 	echo "is connecting to the internet"
 	nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
-	while true; do
-		if $LISTCMD 2>/dev/null | grep -i python3 | grep -i 9092 | grep -i listen >/dev/null 2>&1; then
-			break
-		fi
-		#killall -q python3
-		nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
-		sleep 1
-	done
 	sleep 1
 	nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 	for i in {1..3}; do
@@ -44,7 +31,6 @@ tunnel() {
 			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		fi
 		echo -e "Failed!"
-		exit
 	done
 }
 
