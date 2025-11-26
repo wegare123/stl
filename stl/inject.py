@@ -134,5 +134,5 @@ class injector:
 	        
 	def logs(self,log):
 		logtime = str(time.ctime()).split()[3]
-		logfile = open('logs.txt','a')
+		logfile = open('/root/logs.txt','a')
 		logfile.write(f'[{logtime}] : {str(log)}\n')
