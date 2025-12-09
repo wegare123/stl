@@ -12,11 +12,6 @@ while true; do
 		sleep 1
 	fi
 
-	cek_ssh_CLOSE_WAIT="$(netstat -plantu | grep ssh | grep CLOSE_WAIT | awk '{print $6}' | wc -l)"
-	if [[ $cek_ssh_CLOSE_WAIT -gt '10' ]]; then
-		killall -q ssh sshpass
-	fi
-
 	cek_ssh="$(netstat -plantu | grep -i ssh | grep -i 1080 | grep -i listen)"
 	if [[ -z $cek_ssh ]]; then
 		route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
