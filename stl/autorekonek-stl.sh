@@ -19,6 +19,7 @@ while true; do
 		route del "$host" gw "$route" metric 0 2>/dev/null
 		route del "$proxy2" gw "$route" metric 0 2>/dev/null
 		route del default gw 10.0.0.2 metric 0 2>/dev/null
+		/etc/init.d/dnsmasq restart 2>/dev/null
 		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 		route add 1.1.1.1 gw $route metric 0
 		route add 1.0.0.1 gw $route metric 0
@@ -39,6 +40,7 @@ while true; do
 				route del "$host" gw "$route" metric 0 2>/dev/null
 				route del "$proxy2" gw "$route" metric 0 2>/dev/null
 				route del default gw 10.0.0.2 metric 0 2>/dev/null
+				/etc/init.d/dnsmasq restart 2>/dev/null
 				nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
 				route add 1.1.1.1 gw $route metric 0
 				route add 1.0.0.1 gw $route metric 0
