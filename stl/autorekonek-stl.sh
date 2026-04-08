@@ -14,17 +14,29 @@ while true; do
 
 	cek_ssh="$(netstat -plantu | grep -i ssh | grep -i 1080 | grep -i listen)"
 	if [[ -z $cek_ssh ]]; then
-		route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
-		route del 1.0.0.1 gw "$route" metric 0 2>/dev/null
-		route del "$host" gw "$route" metric 0 2>/dev/null
-		route del "$proxy2" gw "$route" metric 0 2>/dev/null
-		route del default gw 10.0.0.2 metric 0 2>/dev/null
-		/etc/init.d/dnsmasq restart 2>/dev/null
-		nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-		route add 1.1.1.1 gw $route metric 0
-		route add 1.0.0.1 gw $route metric 0
-		route add $host gw $route metric 0
-		route add $proxy2 gw $route metric 0 2>/dev/null
+		pillstl="$(cat /root/akun/pillstl.txt)"
+		if [[ $pillstl = "1" ]]; then
+			killall -q badvpn-tun2socks python3
+			route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
+			route del 1.0.0.1 gw "$route" metric 0 2>/dev/null
+			route del "$host" gw "$route" metric 0 2>/dev/null
+			route del "$proxy2" gw "$route" metric 0 2>/dev/null
+			route del default gw 10.0.0.2 metric 0 2>/dev/null
+			/etc/init.d/dnsmasq restart 2>/dev/null
+			nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
+			sleep 1
+			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+			route add 1.1.1.1 gw $route metric 0
+			route add 1.0.0.1 gw $route metric 0
+			route add $host gw $route metric 0
+			route add $proxy2 gw $route metric 0 2>/dev/null
+		elif [[ $pillstl = "2" ]]; then
+			killall -q redsocks python3
+			/etc/init.d/dnsmasq restart 2>/dev/null
+			nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
+			sleep 1
+			nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+		fi
 		sleep 3
 	else
 		var="$(cat /root/logs.txt 2>/dev/null)"
@@ -35,17 +47,29 @@ while true; do
 			if [ "$var_cek" = "SUCCESSFULLY" ]; then
 				rm -r /root/logs.txt 2>/dev/null
 			else
-				route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
-				route del 1.0.0.1 gw "$route" metric 0 2>/dev/null
-				route del "$host" gw "$route" metric 0 2>/dev/null
-				route del "$proxy2" gw "$route" metric 0 2>/dev/null
-				route del default gw 10.0.0.2 metric 0 2>/dev/null
-				/etc/init.d/dnsmasq restart 2>/dev/null
-				nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
-				route add 1.1.1.1 gw $route metric 0
-				route add 1.0.0.1 gw $route metric 0
-				route add $host gw $route metric 0
-				route add $proxy2 gw $route metric 0 2>/dev/null
+				pillstl="$(cat /root/akun/pillstl.txt)"
+				if [[ $pillstl = "1" ]]; then
+					killall -q badvpn-tun2socks python3
+					route del 1.1.1.1 gw "$route" metric 0 2>/dev/null
+					route del 1.0.0.1 gw "$route" metric 0 2>/dev/null
+					route del "$host" gw "$route" metric 0 2>/dev/null
+					route del "$proxy2" gw "$route" metric 0 2>/dev/null
+					route del default gw 10.0.0.2 metric 0 2>/dev/null
+					/etc/init.d/dnsmasq restart 2>/dev/null
+					nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
+					sleep 1
+					nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+					route add 1.1.1.1 gw $route metric 0
+					route add 1.0.0.1 gw $route metric 0
+					route add $host gw $route metric 0
+					route add $proxy2 gw $route metric 0 2>/dev/null
+				elif [[ $pillstl = "2" ]]; then
+					killall -q redsocks python3
+					/etc/init.d/dnsmasq restart 2>/dev/null
+					nohup python3 /root/akun/tunnel.py >/dev/null 2>&1 &
+					sleep 1
+					nohup python3 /root/akun/ssh.py 1 >/dev/null 2>&1 &
+				fi
 				sleep 3
 			fi
 		fi
@@ -55,9 +79,7 @@ while true; do
 	if [[ $pillstl = "1" ]]; then
 		cek_badvpn="$(netstat -plantu | grep -i badvpn)"
 		if [[ -z $cek_badvpn ]]; then
-			#killall -q badvpn-tun2socks
 			gproxy
-			sleep 3
 		fi
 	elif [[ $pillstl = "2" ]]; then
 		cek_redsocks="$(netstat -plantu | grep -i redsocks)"
@@ -65,9 +87,7 @@ while true; do
 			iptables -t nat -F OUTPUT 2>/dev/null
 			iptables -t nat -F PROXY 2>/dev/null
 			iptables -t nat -F PREROUTING 2>/dev/null
-			#killall -q redsocks
 			gproxy
-			sleep 3
 		fi
 	fi
 
