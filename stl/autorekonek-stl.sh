@@ -96,5 +96,5 @@ while true; do
 		route add default gw 10.0.0.2 metric 0 2>/dev/null
 		sleep 1
 	fi
-sleep 1
+    sleep 1
 done
